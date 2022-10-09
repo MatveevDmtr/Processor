@@ -1,0 +1,9 @@
+*.save
+*.exe
+*.bmarks
+*.depend
+*.html
+*.layout
+*.cbp
+*.log*
+*.o

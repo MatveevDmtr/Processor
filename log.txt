@@ -1,0 +1,26 @@
+
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--------------------Start program--------------------
+Size of file is: 25 bytes.
+Type_calloc: char
+Sizeof type: 4
+Calloc returned: 00DF0E60
+
+buffer size: 25
+fread number of symbols: 24
+Num lines: 3
+Type_calloc: type_prop_line
+Sizeof type: 4
+Calloc returned: 00DF0E88
+
+Type_calloc: char
+Sizeof type: 4
+Calloc returned: 00DF0EA8
+
+Command found: push
+Command found: push
+Command found: add
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--------------------Finish program--------------------
