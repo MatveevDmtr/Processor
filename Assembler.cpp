@@ -14,6 +14,17 @@ const size_t MAX_LEN_CMD = 30;
 
 const char* INPUT_FILE_NAME = "user_code.txt";
 
+elem_t PutArg(size_t cmd_code, char* ptr_arg, int* ptr_asm, size_t* ptr_ip);
+
+int HandleRegs(int* ptr_asm, size_t* ptr_ip, char* reg_name);
+
+enum ARG_TYPES
+{
+    ARG_IMMED = (1 << 5),
+    ARG_REG   = (1 << 6),
+    ARG_RAM   = (1 << 7)
+};
+
 int main()
 {
     type_buf_char      user_code         = {NULL, 0, 0};
@@ -21,20 +32,158 @@ int main()
 
     read_file(INPUT_FILE_NAME, &user_code, &arr_structs);
 
-    char* ptr_asm_code = NULL;
+    int* ptr_asm_code = NULL;
 
-    ptr_asm_code = allocate_array(char, user_code.Num_lines * 2 * sizeof(int));
+    ptr_asm_code = allocate_array(int, user_code.Num_lines * 3);
 
     Assert(ptr_asm_code == NULL);
 
     char* cmd[MAX_LEN_CMD] = {};
 
+    size_t read_res = 0;
+
+    size_t cmd_code = 1;
+
+    size_t ip = 0;
+
+    char* cursor = NULL;
+
     for (size_t i = 0; i < user_code.Num_lines; i++)
     {
-        sscanf((arr_structs.Ptr)[i].Loc, " %s", cmd);
+        cursor = (arr_structs.Ptr)[i].Loc;
+
+        sscanf(cursor, "%s", cmd);
 
         log("Command found: %s\n", cmd);
+
+        //strcmp
+
+        cursor += strlen((const char*)cmd);
+
+        PutArg(cmd_code, cursor, ptr_asm_code, &ip);
     }
+
+    for (size_t i = 0; i < ip; i++)
+    {
+        log("elem of asm: %d\n", ptr_asm_code[i]);
+    }
+
+    return 0;
+}
+
+int SkipSpace(char** cursor)
+{
+    while (**cursor == ' ') {(*cursor)++;}
+
+    return 0;
+}
+
+elem_t PutArg(size_t cmd_code, char* ptr_arg, int* ptr_asm, size_t* ptr_ip)
+{
+    Assert(ptr_arg == NULL);
+
+    int arg = 0;
+
+    int read_res = 0;
+
+    int  reg_num     = 0;
+
+    char reg_name[5] = {};
+
+    SkipSpace(&ptr_arg);
+
+    log("ptr_arg: %p, first sym to scan: %c\n", ptr_arg, *ptr_arg);
+
+    //txDump(ptr_arg);
+
+    read_res = sscanf(ptr_arg, "[%d+%[a-z]]", &arg, reg_name);
+
+    if (!read_res)
+    {
+        read_res = sscanf(ptr_arg, "[%[a-z]+%d]", &reg_name, &arg);
+    }
+
+    if (read_res == 2)
+    {
+        log("case [d+rcx]\n");
+
+        ptr_asm[(*ptr_ip)++] = cmd_code + ARG_IMMED + ARG_REG + ARG_RAM;
+
+        HandleRegs(ptr_asm, ptr_ip, reg_name);
+
+        ptr_asm[(*ptr_ip)++] = arg;
+
+        return arg;
+    }
+
+    read_res = sscanf(ptr_arg, "%d+%[a-z]", &arg, reg_name);
+
+    if (!read_res)
+    {
+        read_res = sscanf(ptr_arg, "%[a-z]+%d", &reg_name, &arg);
+    }
+
+    if (read_res == 2)
+    {
+        log("case d+rcx\n");
+
+        ptr_asm[(*ptr_ip)++] = cmd_code + ARG_IMMED + ARG_REG;
+
+        HandleRegs(ptr_asm, ptr_ip, reg_name);
+
+        ptr_asm[(*ptr_ip)++] = arg;
+
+        return arg;
+    }
+
+    read_res = sscanf(ptr_arg, "%[a-z]", reg_name);
+
+    if (!read_res)
+    {
+        read_res = sscanf(ptr_arg, "%[a-z]", &reg_num);
+    }
+
+    if (read_res == 1)
+    {
+        log("case rcx\n");
+
+        ptr_asm[(*ptr_ip)++] = cmd_code + ARG_REG;
+
+        HandleRegs(ptr_asm, ptr_ip, reg_name);
+
+        return arg;
+    }
+
+    read_res = sscanf(ptr_arg, " %d", &arg);
+
+    if (read_res == 1)
+    {
+        log("simple-dimple\n");
+
+        ptr_asm[(*ptr_ip)++] = cmd_code + ARG_IMMED;
+
+        ptr_asm[(*ptr_ip)++] = arg;
+
+        return arg;
+    }
+
+    print_log(FRAMED, "Syntax Error: Invalid Argument");
+
+    return -1;
+}
+
+int HandleRegs(int* ptr_asm, size_t* ptr_ip, char* reg_name)
+{
+    if (reg_name[0] != 'r' || reg_name[2] != 'x')
+    {
+        print_log(FRAMED, "Syntax Error: name of register is invalid");
+    }
+
+    int reg_num = *(reg_name + 1) - 'a' + 1;
+
+    log("reg_num: %d\n\n", reg_num);
+
+    ptr_asm[(*ptr_ip)++] = reg_num;
 
     return 0;
 }

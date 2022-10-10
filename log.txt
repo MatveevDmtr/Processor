@@ -2,25 +2,66 @@
 
 $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 --------------------Start program--------------------
-Size of file is: 25 bytes.
+Size of file is: 74 bytes.
 Type_calloc: char
 Sizeof type: 4
-Calloc returned: 00DF0E60
+Calloc returned: 00730E60
 
-buffer size: 25
-fread number of symbols: 24
-Num lines: 3
+buffer size: 74
+fread number of symbols: 73
+Num lines: 6
 Type_calloc: type_prop_line
 Sizeof type: 4
-Calloc returned: 00DF0E88
+Calloc returned: 00730EB8
 
-Type_calloc: char
+Type_calloc: int
 Sizeof type: 4
-Calloc returned: 00DF0EA8
+Calloc returned: 00730EF0
 
 Command found: push
+ptr_arg: 00730E65, first sym to scan: 1
+simple-dimple
 Command found: push
-Command found: add
+ptr_arg: 00730E6E, first sym to scan: [
+case [d+rcx]
+reg_num: 3
+
+Command found: push
+ptr_arg: 00730E7D, first sym to scan: [
+case [d+rcx]
+reg_num: 3
+
+Command found: push
+ptr_arg: 00730E8C, first sym to scan: 2
+case d+rcx
+reg_num: 3
+
+Command found: push
+ptr_arg: 00730E99, first sym to scan: r
+case d+rcx
+reg_num: 3
+
+Command found: push
+ptr_arg: 00730EA6, first sym to scan: r
+case rcx
+reg_num: 3
+
+elem of asm: 33
+elem of asm: 10
+elem of asm: 225
+elem of asm: 3
+elem of asm: 20
+elem of asm: 225
+elem of asm: 3
+elem of asm: 20
+elem of asm: 97
+elem of asm: 3
+elem of asm: 20
+elem of asm: 97
+elem of asm: 3
+elem of asm: 20
+elem of asm: 65
+elem of asm: 3
 
 $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 --------------------Finish program--------------------

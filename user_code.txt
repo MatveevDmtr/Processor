@@ -1,3 +1,6 @@
-   push 10
-push 20
-add
+push 10
+push [20+rcx]
+push [rcx+20]
+push 20+rcx
+push rcx+20
+push rcx
