@@ -13,10 +13,22 @@ enum CMD_NAMES
 {
     CMD_HLT  = 0 ,
     CMD_PUSH = 1 ,
-    CMD_ADD  = 2 ,
-    CMD_JUMP = 10,
-    CMD_NAME = 17,
-    CMD_LAB  = 18
+    CMD_POP  = 2 ,
+    CMD_ADD  = 3 ,
+    CMD_SUB  = 4 ,
+    CMD_MUL  = 5 ,
+    CMD_DIV  = 6 ,
+    CMD_IN   = 7 ,
+    CMD_OUT  = 8 ,
+    CMD_JUMP = 9 ,
+    CMD_JB   = 10,
+    CMD_JBE  = 11,
+    CMD_JA   = 12,
+    CMD_JAE  = 13,
+    CMD_JE   = 14,
+    CMD_JNE  = 15,
+    CMD_NAME = 16,
+    CMD_LAB  = 17
 };
 
 typedef int elem_t;
@@ -38,7 +50,27 @@ int HandleRegs(int* ptr_asm, size_t* ptr_ip, char* reg_name);
 int UserCodeToASM(type_buf_char*    ptr_user_code,
                   type_buf_structs* ptr_arr_structs,
                   label_field* labels,
-                  int* ptr_asm_code);
+                  int* ptr_asm);
+
+int FuncName(char*        ptr_arg,
+             int*         ptr_asm,
+             size_t*      ptr_ip,
+             label_field* labels);
+
+int FuncJump(char*        ptr_arg,
+             int*         ptr_asm,
+             size_t*      ptr_ip,
+             label_field* labels);
+
+int FuncLab(char*        ptr_arg,
+            int*         ptr_asm,
+            size_t*      ptr_ip,
+            label_field* labels);
+
+size_t IdentifyNumLabel(char*        ptr_arg,
+                         int*         ptr_asm,
+                         size_t*      ptr_ip,
+                         label_field* labels);
 
 enum ARG_TYPES
 {
@@ -54,15 +86,17 @@ int main()
 
     read_file(INPUT_FILE_NAME, &user_code, &arr_structs);
 
-    int* ptr_asm_code = NULL;
+    int* ptr_asm = NULL;
 
-    ptr_asm_code = allocate_array(int, user_code.Num_lines * 3);
+    ptr_asm = allocate_array(int, user_code.Num_lines * 3);
 
-    Assert(ptr_asm_code == NULL);
+    Assert(ptr_asm == NULL);
 
-    label_field labels[MAX_NUM_LABELS] = {};
+    label_field labels[MAX_NUM_LABELS] = {{87, ""}};
 
-    UserCodeToASM(&user_code, &arr_structs, labels, ptr_asm_code);
+    UserCodeToASM(&user_code, &arr_structs, labels, ptr_asm);
+
+    UserCodeToASM(&user_code, &arr_structs, labels, ptr_asm);
 
     return 0;
 }
@@ -70,13 +104,13 @@ int main()
 int UserCodeToASM(type_buf_char*    ptr_user_code,
                   type_buf_structs* ptr_arr_structs,
                   label_field* labels,
-                  int* ptr_asm_code)
+                  int* ptr_asm)
 {
     char   cmd[MAX_LEN_CMD] = {};
 
     size_t read_res = 0;
 
-    size_t cmd_code = 1;
+    size_t cmd_code = 0;
 
     size_t ip = 0;
 
@@ -88,31 +122,42 @@ int UserCodeToASM(type_buf_char*    ptr_user_code,
 
         sscanf(cursor, "%s", cmd);
 
+        cursor += strlen((const char*)cmd);
+
         log("Command found: %s\n", cmd);
 
-        if (strcmp(cmd, "push"))
+        if (!strcmp(cmd, "push"))
         {
             cmd_code = CMD_PUSH;
         }
-        else if (strcmp(cmd, "jump"))
+        else if (!strcmp(cmd, "jump"))
         {
             cmd_code = CMD_JUMP;
+
+            FuncJump(cursor, ptr_asm, &ip, labels);
         }
-        else if (strcmp(cmd, "name"))
+        else if (!strcmp(cmd, "name"))
         {
             cmd_code = CMD_NAME;
+
+            FuncName(cursor, ptr_asm, &ip, labels);
+        }
+        else if (!strcmp(cmd, "lab"))
+        {
+            cmd_code = CMD_LAB;
+
+            FuncLab(cursor, ptr_asm, &ip, labels);
         }
 
-        //strcmp
-
-        cursor += strlen((const char*)cmd);
-
-        PutArg(cmd_code, cursor, ptr_asm_code, &ip, labels);
+        if (cmd_code == CMD_PUSH || cmd_code == CMD_POP)
+        {
+            PutArg(cmd_code, cursor, ptr_asm, &ip, labels);
+        }
     }
 
     for (size_t i = 0; i < ip; i++)
     {
-        log("elem of asm: %d\n", ptr_asm_code[i]);
+        log("elem of asm: %d\n", ptr_asm[i]);
     }
 
     return 0;
@@ -131,7 +176,7 @@ int SearchLabelByName(label_field* labels, char* name)
 
     while (i < MAX_NUM_LABELS)
     {
-        if (labels[i].Name == name)     return i;
+        if (!strcmp(labels[i].Name, name))     return i;
 
         i++;
     }
@@ -139,6 +184,112 @@ int SearchLabelByName(label_field* labels, char* name)
     print_log(FRAMED, "LABEL ERROR: No such label found");
 
     return -1;
+}
+
+int FuncLab(char*        ptr_arg,
+            int*         ptr_asm,
+            size_t*      ptr_ip,
+            label_field* labels)
+{
+    size_t num_label = IdentifyNumLabel(ptr_arg, ptr_asm, ptr_ip, labels);
+
+    labels[num_label].Value = *ptr_ip + 1;
+
+    return 0;
+}
+
+int FuncName(char*        ptr_arg,
+             int*         ptr_asm,
+             size_t*      ptr_ip,
+             label_field* labels)
+{
+    log("case name\n");
+
+    SkipSpace(&ptr_arg);
+
+    size_t num_label = -1;
+
+    char label_name[MAX_LEN_LABEL_NAME] = {};
+
+    if (!sscanf(ptr_arg, "%s", label_name))
+    {
+        print_log(FRAMED, "LABEL ERROR: Unreadable name");
+
+        return -1;
+    }
+
+    SkipSpace(&ptr_arg);
+
+    ptr_arg += strlen((const char*)label_name);
+
+    if (!sscanf(ptr_arg, "%d", &num_label))
+    {
+        print_log(FRAMED, "LABEL ERROR: Unreadable name");
+
+        return -1;
+    }
+
+    strcpy(labels[num_label].Name, label_name);
+
+    return 0;
+}
+
+int FuncJump(char*        ptr_arg,
+             int*         ptr_asm,
+             size_t*      ptr_ip,
+             label_field* labels)
+{
+    log("case jump\n");
+
+    size_t num_label = IdentifyNumLabel(ptr_arg, ptr_asm, ptr_ip, labels);
+
+    ptr_asm[(*ptr_ip)++] = CMD_JUMP;
+
+    ptr_asm[(*ptr_ip)++] = labels[num_label].Value;
+
+    return 0;
+}
+
+size_t IdentifyNumLabel(char*        ptr_arg,
+                         int*         ptr_asm,
+                         size_t*      ptr_ip,
+                         label_field* labels)
+{
+    SkipSpace(&ptr_arg);
+
+    size_t num_label = -1;
+
+    if (!isdigit(*ptr_arg))
+    {
+        char label_name[MAX_LEN_LABEL_NAME] = {};
+
+        if (!sscanf(ptr_arg, "%s", label_name))
+        {
+            print_log(FRAMED, "LABEL ERROR: Unreadable name");
+
+            return -1;
+        }
+
+        num_label = SearchLabelByName(labels, label_name);
+    }
+    else
+    {
+        if (!sscanf(ptr_arg, "%d", &num_label))
+        {
+            print_log(FRAMED, "LABEL ERROR: Unreadable digit");
+
+            return -1;
+        }
+    }
+
+    Assert(num_label == -1);
+
+    if (num_label == -1)
+    {
+        return -1;
+    }
+
+    return num_label;
 }
 
 elem_t PutArg(size_t       cmd_code,
@@ -149,48 +300,7 @@ elem_t PutArg(size_t       cmd_code,
 {
     Assert(ptr_arg == NULL);
 
-    if (cmd_code != CMD_PUSH && cmd_code != CMD_JUMP) // ohhhhhhh
-    {
-        ptr_asm[(*ptr_ip)++] = cmd_code;
-
-        return 0;
-    }
-
-    if (cmd_code == CMD_JUMP)
-    {
-        SkipSpace(&ptr_arg);
-
-        size_t num_label = -1;
-
-
-        if (!isdigit(*ptr_arg))
-        {
-            char label_name[MAX_LEN_LABEL_NAME] = {};
-
-            sscanf(ptr_arg, "%s", label_name); // check
-
-            num_label = SearchLabelByName(labels, label_name);
-        }
-        else
-        {
-            sscanf(ptr_arg, "%d", &num_label);
-        }
-
-        Assert(num_label == -1);
-
-        if (num_label == -1)
-        {
-            return -1;
-        }
-
-        log("case jump\n");
-
-        ptr_asm[(*ptr_ip)++] = cmd_code;
-
-        ptr_asm[(*ptr_ip)++] = labels[num_label].Value;
-
-        return labels[num_label].Value;
-    }
+    log("cmd_code: %d\n", cmd_code);
 
     int  arg         = 0;
 
@@ -228,7 +338,7 @@ elem_t PutArg(size_t       cmd_code,
 
     if (!read_res)
     {
-        read_res = sscanf(ptr_arg, "%[a-z]+%d", &reg_name, &arg);
+        read_res = sscanf(ptr_arg, "%[a-z]+%d", reg_name, &arg);
     }
 
     if (read_res == 2)
@@ -244,12 +354,20 @@ elem_t PutArg(size_t       cmd_code,
         return arg;
     }
 
-    read_res = sscanf(ptr_arg, "%[a-z]", reg_name);
+    read_res = sscanf(ptr_arg, "[%d]", &arg);
 
-    if (!read_res)
+    if (read_res == 1)
     {
-        read_res = sscanf(ptr_arg, "%[a-z]", &reg_num);
+        log("case [d]\n");
+
+        ptr_asm[(*ptr_ip)++] = cmd_code + ARG_IMMED + ARG_RAM;
+
+        ptr_asm[(*ptr_ip)++] = arg;
+
+        return NULL;
     }
+
+    read_res = sscanf(ptr_arg, "%[a-z]", reg_name);
 
     if (read_res == 1)
     {

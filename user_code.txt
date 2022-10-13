@@ -4,4 +4,10 @@ push [rcx+20]
 push 20+rcx
 push rcx+20
 push rcx
-jump 7
+name SanyaLoh 0
+jump SanyaLoh
+push [10]
+push 10
+push 14
+lab 0
+push 10
