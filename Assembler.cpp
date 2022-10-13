@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <ctype.h>
 
 #include "onegin.h"
 #include "stack.h"
@@ -8,15 +9,36 @@
 #include "assembler.h"
 //#include <TXLib.h>
 
+enum CMD_NAMES
+{
+    CMD_HLT  = 0 ,
+    CMD_PUSH = 1 ,
+    CMD_ADD  = 2 ,
+    CMD_JUMP = 10,
+    CMD_NAME = 17,
+    CMD_LAB  = 18
+};
+
 typedef int elem_t;
 
-const size_t MAX_LEN_CMD = 30;
+const size_t MAX_LEN_CMD    = 30;
+
+const size_t MAX_NUM_LABELS = 30;
 
 const char* INPUT_FILE_NAME = "user_code.txt";
 
-elem_t PutArg(size_t cmd_code, char* ptr_arg, int* ptr_asm, size_t* ptr_ip);
+elem_t PutArg(size_t       cmd_code,
+              char*        ptr_arg,
+              int*         ptr_asm,
+              size_t*      ptr_ip,
+              label_field* labels);
 
 int HandleRegs(int* ptr_asm, size_t* ptr_ip, char* reg_name);
+
+int UserCodeToASM(type_buf_char*    ptr_user_code,
+                  type_buf_structs* ptr_arr_structs,
+                  label_field* labels,
+                  int* ptr_asm_code);
 
 enum ARG_TYPES
 {
@@ -38,7 +60,19 @@ int main()
 
     Assert(ptr_asm_code == NULL);
 
-    char* cmd[MAX_LEN_CMD] = {};
+    label_field labels[MAX_NUM_LABELS] = {};
+
+    UserCodeToASM(&user_code, &arr_structs, labels, ptr_asm_code);
+
+    return 0;
+}
+
+int UserCodeToASM(type_buf_char*    ptr_user_code,
+                  type_buf_structs* ptr_arr_structs,
+                  label_field* labels,
+                  int* ptr_asm_code)
+{
+    char   cmd[MAX_LEN_CMD] = {};
 
     size_t read_res = 0;
 
@@ -46,21 +80,34 @@ int main()
 
     size_t ip = 0;
 
-    char* cursor = NULL;
+    char*  cursor = NULL;
 
-    for (size_t i = 0; i < user_code.Num_lines; i++)
+    for (size_t i = 0; i < ptr_user_code->Num_lines; i++)
     {
-        cursor = (arr_structs.Ptr)[i].Loc;
+        cursor = (ptr_arr_structs->Ptr)[i].Loc;
 
         sscanf(cursor, "%s", cmd);
 
         log("Command found: %s\n", cmd);
 
+        if (strcmp(cmd, "push"))
+        {
+            cmd_code = CMD_PUSH;
+        }
+        else if (strcmp(cmd, "jump"))
+        {
+            cmd_code = CMD_JUMP;
+        }
+        else if (strcmp(cmd, "name"))
+        {
+            cmd_code = CMD_NAME;
+        }
+
         //strcmp
 
         cursor += strlen((const char*)cmd);
 
-        PutArg(cmd_code, cursor, ptr_asm_code, &ip);
+        PutArg(cmd_code, cursor, ptr_asm_code, &ip, labels);
     }
 
     for (size_t i = 0; i < ip; i++)
@@ -78,13 +125,76 @@ int SkipSpace(char** cursor)
     return 0;
 }
 
-elem_t PutArg(size_t cmd_code, char* ptr_arg, int* ptr_asm, size_t* ptr_ip)
+int SearchLabelByName(label_field* labels, char* name)
+{
+    size_t i = 0;
+
+    while (i < MAX_NUM_LABELS)
+    {
+        if (labels[i].Name == name)     return i;
+
+        i++;
+    }
+
+    print_log(FRAMED, "LABEL ERROR: No such label found");
+
+    return -1;
+}
+
+elem_t PutArg(size_t       cmd_code,
+              char*        ptr_arg,
+              int*         ptr_asm,
+              size_t*      ptr_ip,
+              label_field* labels)
 {
     Assert(ptr_arg == NULL);
 
-    int arg = 0;
+    if (cmd_code != CMD_PUSH && cmd_code != CMD_JUMP) // ohhhhhhh
+    {
+        ptr_asm[(*ptr_ip)++] = cmd_code;
 
-    int read_res = 0;
+        return 0;
+    }
+
+    if (cmd_code == CMD_JUMP)
+    {
+        SkipSpace(&ptr_arg);
+
+        size_t num_label = -1;
+
+
+        if (!isdigit(*ptr_arg))
+        {
+            char label_name[MAX_LEN_LABEL_NAME] = {};
+
+            sscanf(ptr_arg, "%s", label_name); // check
+
+            num_label = SearchLabelByName(labels, label_name);
+        }
+        else
+        {
+            sscanf(ptr_arg, "%d", &num_label);
+        }
+
+        Assert(num_label == -1);
+
+        if (num_label == -1)
+        {
+            return -1;
+        }
+
+        log("case jump\n");
+
+        ptr_asm[(*ptr_ip)++] = cmd_code;
+
+        ptr_asm[(*ptr_ip)++] = labels[num_label].Value;
+
+        return labels[num_label].Value;
+    }
+
+    int  arg         = 0;
+
+    int  read_res    = 0;
 
     int  reg_num     = 0;
 
@@ -99,9 +209,7 @@ elem_t PutArg(size_t cmd_code, char* ptr_arg, int* ptr_asm, size_t* ptr_ip)
     read_res = sscanf(ptr_arg, "[%d+%[a-z]]", &arg, reg_name);
 
     if (!read_res)
-    {
         read_res = sscanf(ptr_arg, "[%[a-z]+%d]", &reg_name, &arg);
-    }
 
     if (read_res == 2)
     {
@@ -151,10 +259,10 @@ elem_t PutArg(size_t cmd_code, char* ptr_arg, int* ptr_asm, size_t* ptr_ip)
 
         HandleRegs(ptr_asm, ptr_ip, reg_name);
 
-        return arg;
+        return NULL;
     }
 
-    read_res = sscanf(ptr_arg, " %d", &arg);
+    read_res = sscanf(ptr_arg, "%d", &arg);
 
     if (read_res == 1)
     {
@@ -171,6 +279,28 @@ elem_t PutArg(size_t cmd_code, char* ptr_arg, int* ptr_asm, size_t* ptr_ip)
 
     return -1;
 }
+
+/*int ReadByFormat(char* mask1, char* mask2, ...)
+{
+    va_list args;
+
+    va_start (args, format);
+
+    va_arg(args, int);
+
+    va_arg(args, char*);
+
+    read_res = sscanf(ptr_arg, mask1, &arg, reg_name);
+
+    if (!read_res)
+    {
+        read_res = sscanf(ptr_arg, mask2, &reg_name, &arg);
+    }
+
+    fflush(LOG_FILE);
+
+    va_end(args);
+}*/
 
 int HandleRegs(int* ptr_asm, size_t* ptr_ip, char* reg_name)
 {

@@ -1,3 +1,16 @@
+#ifndef ASSEMBLER_H_INCLUDED
+#define ASSEMBLER_H_INCLUDED
+
+const size_t MAX_LEN_LABEL_NAME = 10;
+
+
+typedef struct LABEL
+{
+    int   Value                   ;
+    char  Name[MAX_LEN_LABEL_NAME];
+}
+label_field;
+
 
 #define allocate_array(type, num_elems)                             \
 ({                                                                  \
@@ -16,3 +29,5 @@
     Assert(variable__ == invalid_value);      \
     variable__;                               \
 })
+
+#endif

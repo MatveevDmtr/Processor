@@ -4,3 +4,4 @@ push [rcx+20]
 push 20+rcx
 push rcx+20
 push rcx
+jump 7
