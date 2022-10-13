@@ -72,6 +72,12 @@ size_t IdentifyNumLabel(char*        ptr_arg,
                          size_t*      ptr_ip,
                          label_field* labels);
 
+int WriteASM(int* ptr_asm, char* filename, size_t buf_size);
+
+FILE* open_Wfile(char* filename);
+
+int put_buffer(FILE* w_file, int* ptr_asm, size_t buf_size);
+
 enum ARG_TYPES
 {
     ARG_IMMED = (1 << 5),
@@ -97,6 +103,8 @@ int main()
     UserCodeToASM(&user_code, &arr_structs, labels, ptr_asm);
 
     UserCodeToASM(&user_code, &arr_structs, labels, ptr_asm);
+
+    WriteASM(ptr_asm, "ASM.txt", user_code.Num_lines * 3);
 
     return 0;
 }
@@ -620,6 +628,48 @@ int end_of_line(char sym)
             sym == '\n' ||
             sym == '\r') ?
             true : false;
+}
+
+int WriteASM(int* ptr_asm, char* filename, size_t buf_size)
+{
+    FILE* file = open_Wfile(filename);
+
+    put_buffer(file, ptr_asm, buf_size);
+
+    return 0;
+}
+
+FILE* open_Wfile(char* filename)
+{
+    FILE* w_file = fopen(filename, "wb");
+
+    if(w_file == NULL)
+    {
+        log("Opening file to write %s failed\n", filename);
+
+        return NULL;
+    }
+
+    return w_file;
+}
+
+int put_buffer(FILE* w_file, int* ptr_asm, size_t buf_size)
+{
+    size_t num_written_sym = fwrite(ptr_asm,
+                                    sizeof(int),
+                                    buf_size,
+                                    w_file);
+
+    if (num_written_sym != buf_size)
+    {
+        print_log(FRAMED, "Error in writing to file\n");
+
+        return -1;
+    }
+
+    log("File is written successfully\n");
+
+    return 0;
 }
 
 /*int MakeAsmArray(char* asm_arr, )
