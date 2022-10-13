@@ -39,6 +39,9 @@ const size_t MAX_NUM_LABELS = 30;
 
 const char* INPUT_FILE_NAME = "user_code.txt";
 
+const char* SIGNATURE = "MDA";
+
+
 elem_t PutArg(size_t       cmd_code,
               char*        ptr_arg,
               int*         ptr_asm,
@@ -75,6 +78,8 @@ size_t IdentifyNumLabel(char*        ptr_arg,
 int WriteASM(int* ptr_asm, char* filename, size_t buf_size);
 
 FILE* open_Wfile(char* filename);
+
+int WriteHead(FILE* file, size_t buf_size);
 
 int put_buffer(FILE* w_file, int* ptr_asm, size_t buf_size);
 
@@ -536,8 +541,6 @@ int create_array_structs(type_buf_char*    ptr_text_buf,
                 (ptr_arr_structs->Ptr)[index_line] = {ptr_prev_line,
                                                      (ptr_text_buf->Ptr) + i - ptr_prev_line};
 
-                //(ptr_arr_adrs->Ptr)[index_line] = (ptr_arr_structs->Ptr) + index_line;
-
                 index_line++;
             }
 
@@ -634,7 +637,22 @@ int WriteASM(int* ptr_asm, char* filename, size_t buf_size)
 {
     FILE* file = open_Wfile(filename);
 
+    WriteHead(file, buf_size);
+
     put_buffer(file, ptr_asm, buf_size);
+
+    return 0;
+}
+
+int WriteHead(FILE* file, size_t buf_size)
+{
+    fwrite(SIGNATURE, sizeof(char), strlen(SIGNATURE), file);
+
+    fputc('\n', file);
+
+    fwrite(&buf_size, sizeof(int), 1, file);
+
+    fputc('\n', file);
 
     return 0;
 }
@@ -671,10 +689,3 @@ int put_buffer(FILE* w_file, int* ptr_asm, size_t buf_size)
 
     return 0;
 }
-
-/*int MakeAsmArray(char* asm_arr, )
-
-int name_to_asm(char* name)
-{
-    if (strcmp(name, "push"))                   return
-}*/

@@ -5,50 +5,50 @@ $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 Size of file is: 151 bytes.
 Type_calloc: char
 Sizeof type: 4
-Calloc returned: 007E0E60
+Calloc returned: 00B70E60
 
 buffer size: 151
 fread number of symbols: 150
 Num lines: 13
 Type_calloc: type_prop_line
 Sizeof type: 4
-Calloc returned: 007E0F00
+Calloc returned: 00B70F00
 
 Type_calloc: int
 Sizeof type: 4
-Calloc returned: 007E0F70
+Calloc returned: 00B70F70
 
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0E65, first sym to scan: 1
+ptr_arg: 00B70E65, first sym to scan: 1
 simple-dimple
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0E6E, first sym to scan: [
+ptr_arg: 00B70E6E, first sym to scan: [
 case [d+rcx]
 reg_num: 3
 
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0E7D, first sym to scan: [
+ptr_arg: 00B70E7D, first sym to scan: [
 case [d+rcx]
 reg_num: 3
 
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0E8C, first sym to scan: 2
+ptr_arg: 00B70E8C, first sym to scan: 2
 case d+rcx
 reg_num: 3
 
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0E99, first sym to scan: r
+ptr_arg: 00B70E99, first sym to scan: r
 case d+rcx
 reg_num: 3
 
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0EA6, first sym to scan: r
+ptr_arg: 00B70EA6, first sym to scan: r
 case rcx
 reg_num: 3
 
@@ -58,20 +58,20 @@ Command found: jump
 case jump
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0ED0, first sym to scan: [
+ptr_arg: 00B70ED0, first sym to scan: [
 case [d]
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0EDB, first sym to scan: 1
+ptr_arg: 00B70EDB, first sym to scan: 1
 simple-dimple
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0EE4, first sym to scan: 1
+ptr_arg: 00B70EE4, first sym to scan: 1
 simple-dimple
 Command found: lab
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0EF4, first sym to scan: 1
+ptr_arg: 00B70EF4, first sym to scan: 1
 simple-dimple
 elem of asm: 33
 elem of asm: 10
@@ -101,35 +101,35 @@ elem of asm: 33
 elem of asm: 10
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0E65, first sym to scan: 1
+ptr_arg: 00B70E65, first sym to scan: 1
 simple-dimple
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0E6E, first sym to scan: [
+ptr_arg: 00B70E6E, first sym to scan: [
 case [d+rcx]
 reg_num: 3
 
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0E7D, first sym to scan: [
+ptr_arg: 00B70E7D, first sym to scan: [
 case [d+rcx]
 reg_num: 3
 
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0E8C, first sym to scan: 2
+ptr_arg: 00B70E8C, first sym to scan: 2
 case d+rcx
 reg_num: 3
 
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0E99, first sym to scan: r
+ptr_arg: 00B70E99, first sym to scan: r
 case d+rcx
 reg_num: 3
 
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0EA6, first sym to scan: r
+ptr_arg: 00B70EA6, first sym to scan: r
 case rcx
 reg_num: 3
 
@@ -139,20 +139,20 @@ Command found: jump
 case jump
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0ED0, first sym to scan: [
+ptr_arg: 00B70ED0, first sym to scan: [
 case [d]
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0EDB, first sym to scan: 1
+ptr_arg: 00B70EDB, first sym to scan: 1
 simple-dimple
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0EE4, first sym to scan: 1
+ptr_arg: 00B70EE4, first sym to scan: 1
 simple-dimple
 Command found: lab
 Command found: push
 cmd_code: 1
-ptr_arg: 007E0EF4, first sym to scan: 1
+ptr_arg: 00B70EF4, first sym to scan: 1
 simple-dimple
 elem of asm: 33
 elem of asm: 10
