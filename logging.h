@@ -29,7 +29,7 @@ enum LOG_MODES
 {                                                          \
     if(condition)                                          \
     {                                                      \
-        print_log(FRAMED, "ASSERTION ERROR");              \
+        print_log(FRAMED, "AssertION ERROR");              \
         log("In line %d in \n%s \nFound (%s).\n",          \
                 __LINE__, __FILE__, #condition);           \
     }                                                      \

@@ -2,185 +2,259 @@
 
 $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 --------------------Start program--------------------
-Size of file is: 151 bytes.
+Size of file is: 40 bytes.
 Type_calloc: char
 Sizeof type: 4
-Calloc returned: 00B70E60
+Calloc returned: 00140E60
 
-buffer size: 151
-fread number of symbols: 150
-Num lines: 13
+buffer size: 40
+fread number of symbols: 39
+Num lines: 5
 Type_calloc: type_prop_line
 Sizeof type: 4
-Calloc returned: 00B70F00
+Calloc returned: 00140E90
 
 Type_calloc: int
 Sizeof type: 4
-Calloc returned: 00B70F70
+Calloc returned: 00140EC0
 
 Command found: push
 cmd_code: 1
-ptr_arg: 00B70E65, first sym to scan: 1
+ptr_arg: 00140E65, first sym to scan: 1
 simple-dimple
-Command found: push
-cmd_code: 1
-ptr_arg: 00B70E6E, first sym to scan: [
-case [d+rcx]
-reg_num: 3
-
-Command found: push
-cmd_code: 1
-ptr_arg: 00B70E7D, first sym to scan: [
-case [d+rcx]
-reg_num: 3
-
-Command found: push
-cmd_code: 1
-ptr_arg: 00B70E8C, first sym to scan: 2
-case d+rcx
-reg_num: 3
-
-Command found: push
-cmd_code: 1
-ptr_arg: 00B70E99, first sym to scan: r
-case d+rcx
-reg_num: 3
-
-Command found: push
-cmd_code: 1
-ptr_arg: 00B70EA6, first sym to scan: r
+Command found: pop
+cmd_code: 2
+ptr_arg: 00140E6D, first sym to scan: r
 case rcx
-reg_num: 3
-
-Command found: name
-case name
-Command found: jump
-case jump
-Command found: push
-cmd_code: 1
-ptr_arg: 00B70ED0, first sym to scan: [
-case [d]
-Command found: push
-cmd_code: 1
-ptr_arg: 00B70EDB, first sym to scan: 1
-simple-dimple
-Command found: push
-cmd_code: 1
-ptr_arg: 00B70EE4, first sym to scan: 1
-simple-dimple
-Command found: lab
-Command found: push
-cmd_code: 1
-ptr_arg: 00B70EF4, first sym to scan: 1
-simple-dimple
-elem of asm: 33
-elem of asm: 10
-elem of asm: 225
-elem of asm: 3
-elem of asm: 20
-elem of asm: 225
-elem of asm: 3
-elem of asm: 20
-elem of asm: 97
-elem of asm: 3
-elem of asm: 20
-elem of asm: 97
-elem of asm: 3
-elem of asm: 20
-elem of asm: 65
-elem of asm: 3
-elem of asm: 9
-elem of asm: 87
-elem of asm: 161
-elem of asm: 10
-elem of asm: 33
-elem of asm: 10
-elem of asm: 33
-elem of asm: 14
-elem of asm: 33
-elem of asm: 10
-Command found: push
-cmd_code: 1
-ptr_arg: 00B70E65, first sym to scan: 1
-simple-dimple
-Command found: push
-cmd_code: 1
-ptr_arg: 00B70E6E, first sym to scan: [
-case [d+rcx]
-reg_num: 3
+reg_num: 2
 
 Command found: push
 cmd_code: 1
-ptr_arg: 00B70E7D, first sym to scan: [
-case [d+rcx]
-reg_num: 3
-
-Command found: push
-cmd_code: 1
-ptr_arg: 00B70E8C, first sym to scan: 2
+ptr_arg: 00140E77, first sym to scan: r
 case d+rcx
-reg_num: 3
+reg_num: 2
 
+Command found: out
+write cmd num
+Command found: hlt
+write cmd num
+elem of asm: 33
+elem of asm: 10
+elem of asm: 66
+elem of asm: 2
+elem of asm: 97
+elem of asm: 2
+elem of asm: 90
+elem of asm: 8
+elem of asm: 0
 Command found: push
 cmd_code: 1
-ptr_arg: 00B70E99, first sym to scan: r
-case d+rcx
-reg_num: 3
-
-Command found: push
-cmd_code: 1
-ptr_arg: 00B70EA6, first sym to scan: r
+ptr_arg: 00140E65, first sym to scan: 1
+simple-dimple
+Command found: pop
+cmd_code: 2
+ptr_arg: 00140E6D, first sym to scan: r
 case rcx
-reg_num: 3
+reg_num: 2
 
-Command found: name
-case name
-Command found: jump
-case jump
 Command found: push
 cmd_code: 1
-ptr_arg: 00B70ED0, first sym to scan: [
-case [d]
-Command found: push
-cmd_code: 1
-ptr_arg: 00B70EDB, first sym to scan: 1
-simple-dimple
-Command found: push
-cmd_code: 1
-ptr_arg: 00B70EE4, first sym to scan: 1
-simple-dimple
-Command found: lab
-Command found: push
-cmd_code: 1
-ptr_arg: 00B70EF4, first sym to scan: 1
-simple-dimple
+ptr_arg: 00140E77, first sym to scan: r
+case d+rcx
+reg_num: 2
+
+Command found: out
+write cmd num
+Command found: hlt
+write cmd num
 elem of asm: 33
 elem of asm: 10
-elem of asm: 225
-elem of asm: 3
-elem of asm: 20
-elem of asm: 225
-elem of asm: 3
-elem of asm: 20
+elem of asm: 66
+elem of asm: 2
 elem of asm: 97
-elem of asm: 3
-elem of asm: 20
-elem of asm: 97
-elem of asm: 3
-elem of asm: 20
-elem of asm: 65
-elem of asm: 3
-elem of asm: 9
-elem of asm: 25
-elem of asm: 161
-elem of asm: 10
-elem of asm: 33
-elem of asm: 10
-elem of asm: 33
-elem of asm: 14
-elem of asm: 33
-elem of asm: 10
+elem of asm: 2
+elem of asm: 90
+elem of asm: 8
+elem of asm: 0
+written size: 9
 File is written successfully
+
+----------CPU----------
+stk1 created
+Lines read: 1
+sign read: MDA, sign cpu: MDA
+Size already read: 167772160
+Code was read
+ip: 0, Size: 167772160
+cmd_code: 33, cmd_code * mask: 1
+start push
+finish push
+
+
+++++++++++ Start Dump ++++++++++
+
+int Execute(CPU*, stack_t*) at D:\Programming\C\Ded_course_1_sem\Processor_v2\cpu.cpp (line 71):
+Stack [0x00140F10] 
+In int FuckingDump(stack_t*, const char*, const char*, int) (line 374):
+------
+| OK |
+------
+Originally 'stk1' from int Run() at D:\Programming\C\Ded_course_1_sem\Processor_v2\cpu.cpp (line 25): 
+
+Pointer:              00140F10
+Size:                 1
+Capacity:             10
+DeadInside:           0
+PtrStackLeftCannary:  00140F08
+PtrStackRightCannary: 00140F38
+StackHashSum:         1691098403
+StructHashSum:        -866333811
+
+StackLeftCannary:      dedfed15
+StackRightCannary:     ca115fa1
+{
+	 data[0] =          10 = 0000000A
+	 data[1] =           0 = 00000000
+	 data[2] =           0 = 00000000
+	 data[3] =           0 = 00000000
+	 data[4] =           0 = 00000000
+	 data[5] =           0 = 00000000
+	 data[6] =           0 = 00000000
+	 data[7] =           0 = 00000000
+	 data[8] =           0 = 00000000
+	 data[9] =           0 = 00000000
+}
+
+
+---------- Finish Dump ----------
+
+cmd_code: 66, cmd_code * mask: 2
+in pop
+pop done
+
+
+++++++++++ Start Dump ++++++++++
+
+int Execute(CPU*, stack_t*) at D:\Programming\C\Ded_course_1_sem\Processor_v2\cpu.cpp (line 71):
+Stack [0x00140F10] 
+In int FuckingDump(stack_t*, const char*, const char*, int) (line 374):
+------
+| OK |
+------
+Originally 'stk1' from int Run() at D:\Programming\C\Ded_course_1_sem\Processor_v2\cpu.cpp (line 25): 
+
+Pointer:              00140F10
+Size:                 0
+Capacity:             10
+DeadInside:           0
+PtrStackLeftCannary:  00140F08
+PtrStackRightCannary: 00140F38
+StackHashSum:         348344893
+StructHashSum:        -868775217
+
+StackLeftCannary:      dedfed15
+StackRightCannary:     ca115fa1
+{
+	 data[0] = -1163005939 = BAADF00D (POISONED)
+	 data[1] =           0 = 00000000
+	 data[2] =           0 = 00000000
+	 data[3] =           0 = 00000000
+	 data[4] =           0 = 00000000
+	 data[5] =           0 = 00000000
+	 data[6] =           0 = 00000000
+	 data[7] =           0 = 00000000
+	 data[8] =           0 = 00000000
+	 data[9] =           0 = 00000000
+}
+
+
+---------- Finish Dump ----------
+
+cmd_code: 97, cmd_code * mask: 1
+start push
+finish push
+
+
+++++++++++ Start Dump ++++++++++
+
+int Execute(CPU*, stack_t*) at D:\Programming\C\Ded_course_1_sem\Processor_v2\cpu.cpp (line 71):
+Stack [0x00140F10] 
+In int FuckingDump(stack_t*, const char*, const char*, int) (line 374):
+------
+| OK |
+------
+Originally 'stk1' from int Run() at D:\Programming\C\Ded_course_1_sem\Processor_v2\cpu.cpp (line 25): 
+
+Pointer:              00140F10
+Size:                 1
+Capacity:             10
+DeadInside:           0
+PtrStackLeftCannary:  00140F08
+PtrStackRightCannary: 00140F38
+StackHashSum:         271144509
+StructHashSum:        798408431
+
+StackLeftCannary:      dedfed15
+StackRightCannary:     ca115fa1
+{
+	 data[0] =         100 = 00000064
+	 data[1] =           0 = 00000000
+	 data[2] =           0 = 00000000
+	 data[3] =           0 = 00000000
+	 data[4] =           0 = 00000000
+	 data[5] =           0 = 00000000
+	 data[6] =           0 = 00000000
+	 data[7] =           0 = 00000000
+	 data[8] =           0 = 00000000
+	 data[9] =           0 = 00000000
+}
+
+
+---------- Finish Dump ----------
+
+cmd_code: 8, cmd_code * mask: 8
+in out
+
+
+++++++++++ Start Dump ++++++++++
+
+int Execute(CPU*, stack_t*) at D:\Programming\C\Ded_course_1_sem\Processor_v2\cpu.cpp (line 71):
+Stack [0x00140F10] 
+In int FuckingDump(stack_t*, const char*, const char*, int) (line 374):
+------
+| OK |
+------
+Originally 'stk1' from int Run() at D:\Programming\C\Ded_course_1_sem\Processor_v2\cpu.cpp (line 25): 
+
+Pointer:              00140F10
+Size:                 0
+Capacity:             10
+DeadInside:           0
+PtrStackLeftCannary:  00140F08
+PtrStackRightCannary: 00140F38
+StackHashSum:         348344893
+StructHashSum:        -868775217
+
+StackLeftCannary:      dedfed15
+StackRightCannary:     ca115fa1
+{
+	 data[0] = -1163005939 = BAADF00D (POISONED)
+	 data[1] =           0 = 00000000
+	 data[2] =           0 = 00000000
+	 data[3] =           0 = 00000000
+	 data[4] =           0 = 00000000
+	 data[5] =           0 = 00000000
+	 data[6] =           0 = 00000000
+	 data[7] =           0 = 00000000
+	 data[8] =           0 = 00000000
+	 data[9] =           0 = 00000000
+}
+
+
+---------- Finish Dump ----------
+
+cmd_code: 0, cmd_code * mask: 0
+Finish running
 
 $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 --------------------Finish program--------------------

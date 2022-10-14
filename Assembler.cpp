@@ -1,37 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <ctype.h>
-
-#include "onegin.h"
-#include "stack.h"
-#include "logging.h"
 #include "assembler.h"
+
 //#include <TXLib.h>
-
-enum CMD_NAMES
-{
-    CMD_HLT  = 0 ,
-    CMD_PUSH = 1 ,
-    CMD_POP  = 2 ,
-    CMD_ADD  = 3 ,
-    CMD_SUB  = 4 ,
-    CMD_MUL  = 5 ,
-    CMD_DIV  = 6 ,
-    CMD_IN   = 7 ,
-    CMD_OUT  = 8 ,
-    CMD_JUMP = 9 ,
-    CMD_JB   = 10,
-    CMD_JBE  = 11,
-    CMD_JA   = 12,
-    CMD_JAE  = 13,
-    CMD_JE   = 14,
-    CMD_JNE  = 15,
-    CMD_NAME = 16,
-    CMD_LAB  = 17
-};
-
-typedef int elem_t;
 
 const size_t MAX_LEN_CMD    = 30;
 
@@ -41,93 +10,45 @@ const char* INPUT_FILE_NAME = "user_code.txt";
 
 const char* SIGNATURE = "MDA";
 
-
-elem_t PutArg(size_t       cmd_code,
-              char*        ptr_arg,
-              int*         ptr_asm,
-              size_t*      ptr_ip,
-              label_field* labels);
-
-int HandleRegs(int* ptr_asm, size_t* ptr_ip, char* reg_name);
-
-int UserCodeToASM(type_buf_char*    ptr_user_code,
-                  type_buf_structs* ptr_arr_structs,
-                  label_field* labels,
-                  int* ptr_asm);
-
-int FuncName(char*        ptr_arg,
-             int*         ptr_asm,
-             size_t*      ptr_ip,
-             label_field* labels);
-
-int FuncJump(char*        ptr_arg,
-             int*         ptr_asm,
-             size_t*      ptr_ip,
-             label_field* labels);
-
-int FuncLab(char*        ptr_arg,
-            int*         ptr_asm,
-            size_t*      ptr_ip,
-            label_field* labels);
-
-size_t IdentifyNumLabel(char*        ptr_arg,
-                         int*         ptr_asm,
-                         size_t*      ptr_ip,
-                         label_field* labels);
-
-int WriteASM(int* ptr_asm, char* filename, size_t buf_size);
-
-FILE* open_Wfile(char* filename);
-
-int WriteHead(FILE* file, size_t buf_size);
-
-int put_buffer(FILE* w_file, int* ptr_asm, size_t buf_size);
-
-enum ARG_TYPES
-{
-    ARG_IMMED = (1 << 5),
-    ARG_REG   = (1 << 6),
-    ARG_RAM   = (1 << 7)
-};
-
-int main()
+int Assemble()
 {
     type_buf_char      user_code         = {NULL, 0, 0};
     type_buf_structs   arr_structs       = {NULL, 0   };
 
-    read_file(INPUT_FILE_NAME, &user_code, &arr_structs);
-
-    int* ptr_asm = NULL;
-
-    ptr_asm = allocate_array(int, user_code.Num_lines * 3);
-
-    Assert(ptr_asm == NULL);
-
     label_field labels[MAX_NUM_LABELS] = {{87, ""}};
 
-    UserCodeToASM(&user_code, &arr_structs, labels, ptr_asm);
+    asm_t asm_code = {NULL, NULL, 0, labels};
 
-    UserCodeToASM(&user_code, &arr_structs, labels, ptr_asm);
+    read_file(INPUT_FILE_NAME, &user_code, &arr_structs);
 
-    WriteASM(ptr_asm, "ASM.txt", user_code.Num_lines * 3);
+    asm_code.Ptr = allocate_array(int, user_code.Num_lines * 3);
+
+    Assert(asm_code.Ptr == NULL);
+
+    UserCodeToASM(&user_code, &arr_structs, &asm_code);
+
+    UserCodeToASM(&user_code, &arr_structs, &asm_code);
+
+    WriteASM(asm_code.Ptr, "ASM.txt", asm_code.Size);
 
     return 0;
 }
 
 int UserCodeToASM(type_buf_char*    ptr_user_code,
                   type_buf_structs* ptr_arr_structs,
-                  label_field* labels,
-                  int* ptr_asm)
+                  asm_t*            asm_code)
 {
+    asm_code->Ip = 0;
+
     char   cmd[MAX_LEN_CMD] = {};
 
-    size_t read_res = 0;
+    size_t read_res     = 0;
 
-    size_t cmd_code = 0;
-
-    size_t ip = 0;
+    size_t cmd_code     = 0;
 
     char*  cursor = NULL;
+
+    int ifdir = 1;
 
     for (size_t i = 0; i < ptr_user_code->Num_lines; i++)
     {
@@ -143,37 +64,79 @@ int UserCodeToASM(type_buf_char*    ptr_user_code,
         {
             cmd_code = CMD_PUSH;
         }
+        else if (!strcmp(cmd, "pop"))
+        {
+            cmd_code = CMD_POP;
+        }
+        else if (!strcmp(cmd, "add"))
+        {
+            cmd_code = CMD_ADD;
+        }
         else if (!strcmp(cmd, "jump"))
         {
             cmd_code = CMD_JUMP;
 
-            FuncJump(cursor, ptr_asm, &ip, labels);
+            FuncJump(cursor, asm_code);
         }
         else if (!strcmp(cmd, "name"))
         {
             cmd_code = CMD_NAME;
 
-            FuncName(cursor, ptr_asm, &ip, labels);
+            FuncName(cursor, asm_code);
         }
         else if (!strcmp(cmd, "lab"))
         {
             cmd_code = CMD_LAB;
 
-            FuncLab(cursor, ptr_asm, &ip, labels);
+            FuncLab(cursor, asm_code);
+        }
+        else if (!strcmp(cmd, "out"))
+        {
+            cmd_code = CMD_OUT;
+        }
+        else if (!strcmp(cmd, "hlt"))
+        {
+            cmd_code = CMD_HLT;
         }
 
         if (cmd_code == CMD_PUSH || cmd_code == CMD_POP)
         {
-            PutArg(cmd_code, cursor, ptr_asm, &ip, labels);
+            PutArg(cmd_code, cursor, asm_code);
+        }
+
+        if (!IfArg(cmd_code))
+        {
+            log("write cmd num\n");
+
+            (asm_code->Ptr)[(asm_code->Ip)++] = cmd_code;
         }
     }
 
-    for (size_t i = 0; i < ip; i++)
+    for (size_t i = 0; i < asm_code->Ip; i++)
     {
-        log("elem of asm: %d\n", ptr_asm[i]);
+        log("elem of asm: %d\n", (asm_code->Ptr)[i]);
     }
 
+    asm_code->Size = asm_code->Ip;
+
     return 0;
+}
+
+int IfArg(int cmd_code)
+{
+    size_t i = 0;
+
+    while (i < LEN_LIST_CMDS_WO_ARGS)
+    {
+        if (cmd_code == LIST_CMDS_WITHOUT_ARGS[i])
+        {
+            return false;
+        }
+
+        i++;
+    }
+
+    return true;
 }
 
 int SkipSpace(char** cursor)
@@ -200,21 +163,17 @@ int SearchLabelByName(label_field* labels, char* name)
 }
 
 int FuncLab(char*        ptr_arg,
-            int*         ptr_asm,
-            size_t*      ptr_ip,
-            label_field* labels)
+            asm_t*       asm_code)
 {
-    size_t num_label = IdentifyNumLabel(ptr_arg, ptr_asm, ptr_ip, labels);
+    size_t num_label = IdentifyNumLabel(ptr_arg, asm_code);
 
-    labels[num_label].Value = *ptr_ip + 1;
+    asm_code->Labels[num_label].Value = (asm_code->Ip) + 1;
 
     return 0;
 }
 
 int FuncName(char*        ptr_arg,
-             int*         ptr_asm,
-             size_t*      ptr_ip,
-             label_field* labels)
+             asm_t*       asm_code)
 {
     log("case name\n");
 
@@ -242,31 +201,27 @@ int FuncName(char*        ptr_arg,
         return -1;
     }
 
-    strcpy(labels[num_label].Name, label_name);
+    strcpy(asm_code->Labels[num_label].Name, label_name);
 
     return 0;
 }
 
 int FuncJump(char*        ptr_arg,
-             int*         ptr_asm,
-             size_t*      ptr_ip,
-             label_field* labels)
+             asm_t*       asm_code)
 {
     log("case jump\n");
 
-    size_t num_label = IdentifyNumLabel(ptr_arg, ptr_asm, ptr_ip, labels);
+    size_t num_label = IdentifyNumLabel(ptr_arg, asm_code);
 
-    ptr_asm[(*ptr_ip)++] = CMD_JUMP;
+    (asm_code->Ptr)[(asm_code->Ip)++] = CMD_JUMP;
 
-    ptr_asm[(*ptr_ip)++] = labels[num_label].Value;
+    (asm_code->Ptr)[(asm_code->Ip)++] = asm_code->Labels[num_label].Value;
 
     return 0;
 }
 
 size_t IdentifyNumLabel(char*        ptr_arg,
-                         int*         ptr_asm,
-                         size_t*      ptr_ip,
-                         label_field* labels)
+                        asm_t*       asm_code)
 {
     SkipSpace(&ptr_arg);
 
@@ -283,7 +238,7 @@ size_t IdentifyNumLabel(char*        ptr_arg,
             return -1;
         }
 
-        num_label = SearchLabelByName(labels, label_name);
+        num_label = SearchLabelByName(asm_code->Labels, label_name);
     }
     else
     {
@@ -307,9 +262,7 @@ size_t IdentifyNumLabel(char*        ptr_arg,
 
 elem_t PutArg(size_t       cmd_code,
               char*        ptr_arg,
-              int*         ptr_asm,
-              size_t*      ptr_ip,
-              label_field* labels)
+              asm_t*       asm_code)
 {
     Assert(ptr_arg == NULL);
 
@@ -338,11 +291,11 @@ elem_t PutArg(size_t       cmd_code,
     {
         log("case [d+rcx]\n");
 
-        ptr_asm[(*ptr_ip)++] = cmd_code + ARG_IMMED + ARG_REG + ARG_RAM;
+        (asm_code->Ptr)[(asm_code->Ip)++] = cmd_code + ARG_IMMED + ARG_REG + ARG_RAM;
 
-        HandleRegs(ptr_asm, ptr_ip, reg_name);
+        HandleRegs(asm_code, reg_name);
 
-        ptr_asm[(*ptr_ip)++] = arg;
+        asm_code->Ptr[(asm_code->Ip)++] = arg;
 
         return arg;
     }
@@ -358,11 +311,11 @@ elem_t PutArg(size_t       cmd_code,
     {
         log("case d+rcx\n");
 
-        ptr_asm[(*ptr_ip)++] = cmd_code + ARG_IMMED + ARG_REG;
+        (asm_code->Ptr)[(asm_code->Ip)++] = cmd_code + ARG_IMMED + ARG_REG;
 
-        HandleRegs(ptr_asm, ptr_ip, reg_name);
+        HandleRegs(asm_code, reg_name);
 
-        ptr_asm[(*ptr_ip)++] = arg;
+        (asm_code->Ptr)[(asm_code->Ip)++] = arg;
 
         return arg;
     }
@@ -373,9 +326,9 @@ elem_t PutArg(size_t       cmd_code,
     {
         log("case [d]\n");
 
-        ptr_asm[(*ptr_ip)++] = cmd_code + ARG_IMMED + ARG_RAM;
+        (asm_code->Ptr)[(asm_code->Ip)++] = cmd_code + ARG_IMMED + ARG_RAM;
 
-        ptr_asm[(*ptr_ip)++] = arg;
+        (asm_code->Ptr)[(asm_code->Ip)++] = arg;
 
         return NULL;
     }
@@ -386,9 +339,9 @@ elem_t PutArg(size_t       cmd_code,
     {
         log("case rcx\n");
 
-        ptr_asm[(*ptr_ip)++] = cmd_code + ARG_REG;
+        (asm_code->Ptr)[(asm_code->Ip)++] = cmd_code + ARG_REG;
 
-        HandleRegs(ptr_asm, ptr_ip, reg_name);
+        HandleRegs(asm_code, reg_name);
 
         return NULL;
     }
@@ -399,9 +352,9 @@ elem_t PutArg(size_t       cmd_code,
     {
         log("simple-dimple\n");
 
-        ptr_asm[(*ptr_ip)++] = cmd_code + ARG_IMMED;
+        (asm_code->Ptr)[(asm_code->Ip)++] = cmd_code + ARG_IMMED;
 
-        ptr_asm[(*ptr_ip)++] = arg;
+        (asm_code->Ptr)[(asm_code->Ip)++] = arg;
 
         return arg;
     }
@@ -433,18 +386,18 @@ elem_t PutArg(size_t       cmd_code,
     va_end(args);
 }*/
 
-int HandleRegs(int* ptr_asm, size_t* ptr_ip, char* reg_name)
+int HandleRegs(asm_t* asm_code, char* reg_name)
 {
     if (reg_name[0] != 'r' || reg_name[2] != 'x')
     {
         print_log(FRAMED, "Syntax Error: name of register is invalid");
     }
 
-    int reg_num = *(reg_name + 1) - 'a' + 1;
+    int reg_num = *(reg_name + 1) - 'a';
 
     log("reg_num: %d\n\n", reg_num);
 
-    ptr_asm[(*ptr_ip)++] = reg_num;
+    (asm_code->Ptr)[(asm_code->Ip)++] = reg_num;
 
     return 0;
 }
@@ -641,6 +594,8 @@ int WriteASM(int* ptr_asm, char* filename, size_t buf_size)
 
     put_buffer(file, ptr_asm, buf_size);
 
+    fclose(file);
+
     return 0;
 }
 
@@ -649,6 +604,8 @@ int WriteHead(FILE* file, size_t buf_size)
     fwrite(SIGNATURE, sizeof(char), strlen(SIGNATURE), file);
 
     fputc('\n', file);
+
+    log("written size: %d\n", buf_size);
 
     fwrite(&buf_size, sizeof(int), 1, file);
 

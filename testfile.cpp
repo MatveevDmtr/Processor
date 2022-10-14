@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 
-int main1()
+int main100()
 {
     int a = 0;
 

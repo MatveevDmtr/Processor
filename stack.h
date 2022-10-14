@@ -1,8 +1,6 @@
 #ifndef STACK_H_INCLUDED
 #define STACK_H_INCLUDED
 
-#include "StackConfig.h"
-
 #define StructStackInit(name)                              \
         StructureStackInit(#name,                          \
                            __PRETTY_FUNCTION__,            \
@@ -18,6 +16,11 @@
 #else if
     #define StackDump(stk);
 #endif
+
+#include <stdio.h>
+#include "StackConfig.h"
+
+typedef int elem_t;
 
 typedef unsigned long long UnsignedLL;
 
